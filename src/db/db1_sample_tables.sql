@@ -1,25 +1,6 @@
--- Sample SQL for Oracle DB1
--- Creates user/schema `schema1` with password `test1234` (if not exists), grants basic privileges,
--- then creates the sample tables owned by `schema1` only if they don't already exist.
--- NOTE: Running the CREATE USER and GRANT statements requires DBA privileges.
-
--- 1) PL/SQL block to create the user if it doesn't exist
-DECLARE
-    v_count INTEGER;
-BEGIN
-    SELECT COUNT(*) INTO v_count FROM all_users WHERE username = UPPER('schema1');
-    IF v_count = 0 THEN
-        EXECUTE IMMEDIATE 'CREATE USER schema1 IDENTIFIED BY test1234';
-        EXECUTE IMMEDIATE 'GRANT CREATE SESSION TO schema1';
-        EXECUTE IMMEDIATE 'GRANT CREATE TABLE TO schema1';
-        -- Optionally give quota on USERS tablespace (adjust tablespace name as needed):
-        -- EXECUTE IMMEDIATE 'ALTER USER schema1 QUOTA UNLIMITED ON USERS';
-    END IF;
-END;
-/
-
--- 2) Create tables in schema1 only if they do not already exist.
--- We check ALL_TABLES (owner and table_name are stored in uppercase by default).
+-- Tables-only script for DB1: creates tables in schema1 if they don't exist
+-- Run as schema1 (or as a user with permission to create objects in schema1)
+SET SERVEROUTPUT ON
 
 DECLARE
     v_cnt INTEGER;
@@ -32,6 +13,9 @@ BEGIN
             salary NUMBER(8,2),
             dept_id NUMBER(5)
         )]';
+        DBMS_OUTPUT.PUT_LINE('Created table SCHEMA1.EMP_COMMON');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('SCHEMA1.EMP_COMMON already exists');
     END IF;
 
     SELECT COUNT(*) INTO v_cnt FROM all_tables WHERE owner = 'SCHEMA1' AND table_name = 'DEPT_COMMON';
@@ -42,6 +26,9 @@ BEGIN
             location VARCHAR2(50),
             budget NUMBER(12,2)
         )]';
+        DBMS_OUTPUT.PUT_LINE('Created table SCHEMA1.DEPT_COMMON');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('SCHEMA1.DEPT_COMMON already exists');
     END IF;
 
     SELECT COUNT(*) INTO v_cnt FROM all_tables WHERE owner = 'SCHEMA1' AND table_name = 'ONLY_IN_DB1';
@@ -50,6 +37,9 @@ BEGIN
             id NUMBER(10) PRIMARY KEY,
             description VARCHAR2(100)
         )]';
+        DBMS_OUTPUT.PUT_LINE('Created table SCHEMA1.ONLY_IN_DB1');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('SCHEMA1.ONLY_IN_DB1 already exists');
     END IF;
 
     SELECT COUNT(*) INTO v_cnt FROM all_tables WHERE owner = 'SCHEMA1' AND table_name = 'DIFF_TABLE';
@@ -60,8 +50,15 @@ BEGIN
             col2 NUMBER(5,2),
             col3 DATE
         )]';
+        DBMS_OUTPUT.PUT_LINE('Created table SCHEMA1.DIFF_TABLE');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('SCHEMA1.DIFF_TABLE already exists');
     END IF;
 END;
 /
+-- End of tables-only script for DB1
 
--- End of idempotent creation script
+/*
+docker cp src\db\db1_sample_tables.sql ddl_comparator-oracle-db1-1:/tmp/db1_sample_tables.sql
+docker exec -it ddl_comparator-oracle-db1-1 bash -c "source /home/oracle/.bashrc; sqlplus schema1/test1234@localhost/XEPDB1 @/tmp/db1_sample_tables.sql"
+*/  

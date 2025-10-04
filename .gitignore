@@ -33,3 +33,6 @@ Thumbs.db
 
 # Excel output files
 *.xlsx
+
+# Ignore local docker helper scripts/folders
+docker_commands/

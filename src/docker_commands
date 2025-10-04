@@ -1,0 +1,26 @@
+'''
+db1
+'''
+
+docker cp src\db\db1_sample_tables.sql ddl_comparator-oracle-db1-1:/tmp/db1_sample_tables.sql
+docker cp src\db\db1_admin.sql ddl_comparator-oracle-db1-1:/tmp/db1_sample_tables.sql
+
+docker exec -it ddl_comparator-oracle-db1-1 bash
+
+sqlplus SYSTEM/pass1@localhost/XE
+sqlplus SYSTEM/pass1@localhost/XE @/tmp/db1_admin.sql
+sqlplus SYSTEM/pass1@localhost/XE @/tmp/db1_sample_tables.sql
+
+'''
+db2
+'''
+
+docker cp src\db\db2_sample_tables.sql ddl_comparator-oracle-db2-1:/tmp/db2_sample_tables.sql
+docker cp src\db\db2_admin.sql ddl_comparator-oracle-db2-1:/tmp/db2_sample_tables.sql
+
+
+docker exec -it ddl_comparator-oracle-db2-1 bash
+
+sqlplus SYSTEM/pass2@localhost/XE
+sqlplus SYSTEM/pass2@localhost/XE @/tmp/db2_admin.sql
+sqlplus SYSTEM/pass2@localhost/XE @/tmp/db2_sample_tables.sql
