@@ -2,12 +2,12 @@ oracle_db1:
   host: localhost
   port: 1521
   service_name: XE
-  username: SYSTEM
-  password: pass1
+  username: test_schema
+  password: test1234  
 oracle_db2:
   host: localhost
   port: 1522
   service_name: XE
-  username: SYSTEM
-  password: pass2
+  username: test_schema
+  password: test1234
 result_excel_path: DEFAULT

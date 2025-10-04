@@ -11,7 +11,9 @@ def compare_ddls(config_path):
         with open(config_path) as f:
             config = yaml.safe_load(f)
         db1 = OracleDB(config['oracle_db1'])
+        logger.info(f"Successfully connected to DB1: {config['oracle_db1'].get('username','<user>')}@{config['oracle_db1'].get('host')}:{config['oracle_db1'].get('port')}/{config['oracle_db1'].get('service_name')}")
         db2 = OracleDB(config['oracle_db2'])
+        logger.info(f"Successfully connected to DB2: {config['oracle_db2'].get('username','<user>')}@{config['oracle_db2'].get('host')}:{config['oracle_db2'].get('port')}/{config['oracle_db2'].get('service_name')}")
         df1 = db1.get_columns()
         df2 = db2.get_columns()
         merged = pd.merge(df1, df2, on=['table_name', 'column_name'], suffixes=('_db1', '_db2'))
@@ -43,3 +45,5 @@ if __name__ == "__main__":
         ExcelWriter.write(diff, only_db1, only_db2, result_path)
     except Exception as e:
         logging.critical(f"Pipeline failed: {e}")
+
+
