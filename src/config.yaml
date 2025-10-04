@@ -1,0 +1,13 @@
+oracle_db1:
+  host: localhost
+  port: 1521
+  service_name: XE
+  username: SYSTEM
+  password: pass1
+oracle_db2:
+  host: localhost
+  port: 1522
+  service_name: XE
+  username: SYSTEM
+  password: pass2
+result_excel_path: DEFAULT
