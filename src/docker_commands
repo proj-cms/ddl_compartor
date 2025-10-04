@@ -1,9 +1,17 @@
+--Bring up all services (detached, rebuild images first):
+docker compose up -d --build --force-recreate --remove-orphans
+
+
+--List services defined in the Compose file (useful to find exact service names):
+
+docker compose config --services
+
 '''
 db1
 '''
 
 docker cp src\db\db1_sample_tables.sql ddl_comparator-oracle-db1-1:/tmp/db1_sample_tables.sql
-docker cp src\db\db1_admin.sql ddl_comparator-oracle-db1-1:/tmp/db1_sample_tables.sql
+docker cp src\db\db1_admin.sql ddl_comparator-oracle-db1-1:/tmp/db1_admin.sql
 
 docker exec -it ddl_comparator-oracle-db1-1 bash
 
@@ -16,7 +24,7 @@ db2
 '''
 
 docker cp src\db\db2_sample_tables.sql ddl_comparator-oracle-db2-1:/tmp/db2_sample_tables.sql
-docker cp src\db\db2_admin.sql ddl_comparator-oracle-db2-1:/tmp/db2_sample_tables.sql
+docker cp src\db\db2_admin.sql ddl_comparator-oracle-db2-1:/tmp/db2_sample_tabadmin.sql
 
 
 docker exec -it ddl_comparator-oracle-db2-1 bash
