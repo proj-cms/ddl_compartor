@@ -1,4 +1,4 @@
--- Admin script: create schema1 and grant privileges
+-- Admin script: create schtest_schemaema1 and grant privileges
 -- Run this as a DBA (e.g. CONNECT / AS SYSDBA) because CREATE USER requires elevated privileges.
 -- Example: sqlplus / as sysdba
 
@@ -6,16 +6,16 @@ SET SERVEROUTPUT ON
 DECLARE
     v_count INTEGER;
 BEGIN
-    SELECT COUNT(*) INTO v_count FROM all_users WHERE username = UPPER('schema1');
+    SELECT COUNT(*) INTO v_count FROM all_users WHERE username = UPPER('test_schema');
     IF v_count = 0 THEN
-        EXECUTE IMMEDIATE 'CREATE USER schema1 IDENTIFIED BY test1234';
-        EXECUTE IMMEDIATE 'GRANT CREATE SESSION TO schema1';
-        EXECUTE IMMEDIATE 'GRANT CREATE TABLE TO schema1';
+        EXECUTE IMMEDIATE 'CREATE USER test_schema IDENTIFIED BY test1234';
+        EXECUTE IMMEDIATE 'GRANT CREATE SESSION TO test_schema';
+        EXECUTE IMMEDIATE 'GRANT CREATE TABLE TO test_schema';
         -- Optionally set tablespace/quota:
-        -- EXECUTE IMMEDIATE 'ALTER USER schema1 QUOTA UNLIMITED ON USERS';
-        DBMS_OUTPUT.PUT_LINE('Created user SCHEMA1 and granted CREATE SESSION, CREATE TABLE.');
+        -- EXECUTE IMMEDIATE 'ALTER USER test_schema QUOTA UNLIMITED ON USERS';
+        DBMS_OUTPUT.PUT_LINE('Created user test_schema and granted CREATE SESSION, CREATE TABLE.');
     ELSE
-        DBMS_OUTPUT.PUT_LINE('User SCHEMA1 already exists.');
+        DBMS_OUTPUT.PUT_LINE('User test_schema already exists.');
     END IF;
 END;
 /
