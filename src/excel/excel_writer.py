@@ -5,8 +5,17 @@ import pandas as pd
 from typing import Any
 
 class ExcelWriter:
+    """A class to write the comparison results to an Excel file."""
     @staticmethod
     def write(diff: pd.DataFrame, only_db1: pd.DataFrame, only_db2: pd.DataFrame, out_path: str) -> None:
+        """Writes the comparison results to an Excel file.
+
+        Args:
+            diff (pd.DataFrame): A DataFrame containing the differences between the two databases.
+            only_db1 (pd.DataFrame): A DataFrame containing the tables only in the first database.
+            only_db2 (pd.DataFrame): A DataFrame containing the tables only in the second database.
+            out_path (str): The path to the output Excel file.
+        """
         import openpyxl
         from openpyxl.styles import PatternFill
         logger = logging.getLogger(__name__)

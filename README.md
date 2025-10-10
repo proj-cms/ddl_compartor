@@ -35,20 +35,31 @@ This project compares table/view columns between two Oracle databases and genera
 ## Project Folder Structure
 ```
 ddl_comparator/
+├── .gitignore
 ├── docker-compose.yml
 ├── README.md
 ├── requirements.txt
+├── .git/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml
+├── .venv/
 ├── src/
 │   ├── __init__.py
 │   ├── config.yaml
 │   ├── db_compare.py
+│   ├── docker_commands
 │   ├── db/
+│   │   ├── db1_admin.sql
+│   │   ├── db1_sample_tables.sql
+│   │   ├── db2_admin.sql
+│   │   ├── db2_sample_tables.sql
 │   │   └── oracle_db.py
 │   └── excel/
 │       └── excel_writer.py
 └── tests/
-   └── test_db_compare.py
+    ├── __init__.py
+    ├── test_comparator.py
+    ├── test_db_compare.py
+    └── test_excel_writer.py
 ```

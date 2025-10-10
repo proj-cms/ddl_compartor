@@ -3,11 +3,15 @@ oracle_db1:
   port: 1521
   service_name: XE
   username: test_schema
-  password: test1234  
+  password: test1234
+  retry_count: 3
+  retry_delay: 5
 oracle_db2:
   host: localhost
   port: 1522
   service_name: XE
   username: test_schema
   password: test1234
+  retry_count: 3
+  retry_delay: 5
 result_excel_path: DEFAULT

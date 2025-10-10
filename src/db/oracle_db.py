@@ -1,33 +1,50 @@
-import cx_Oracle
+import oracledb
 import pandas as pd
 import logging
 import time
-from sqlalchemy import create_engine
 
 from typing import Dict, Any
 
 class OracleDB:
+    """A class to connect to an Oracle database and retrieve column metadata."""
     def __init__(self, db_conf: Dict[str, Any]) -> None:
+        """Initializes the OracleDB object.
+
+        Args:
+            db_conf (Dict[str, Any]): A dictionary containing the database connection configuration.
+        """
         self.logger = logging.getLogger(__name__)
-        self.dsn = cx_Oracle.makedsn(db_conf['host'], db_conf['port'], service_name=db_conf['service_name'])
-        # Friendly label to indicate which DB this instance represents (can be provided in config)
-        self.label = db_conf.get('label') or f"{db_conf.get('username','<user>')}@{db_conf.get('host')}:{db_conf.get('port')}/{db_conf.get('service_name')}"
+        self.db_conf = db_conf
+        self.label = db_conf.get('label') or f"{db_conf.get('user')}"
+        schemas = db_conf.get('schemas') or db_conf.get('schema')
+        if isinstance(schemas, str):
+            schemas = [schemas]
+        if not schemas:
+            schemas = ['TEST_SCHEMA']
+        self.schemas = [s.upper() for s in schemas]
         self.retry_count = db_conf.get('retry_count', 3)
         self.retry_delay = db_conf.get('retry_delay', 5)
-        self.engine = self._connect_with_retry(db_conf)
+        self.connection = self._connect_with_retry()
 
-    def _connect_with_retry(self, db_conf: Dict[str, Any]) -> Any:
+    def _connect_with_retry(self) -> Any:
+        """Connects to the Oracle database with a retry mechanism.
+
+        Returns:
+            Any: The connection object.
+        """
         attempt = 0
-        connect_str = f"oracle+cx_oracle://{db_conf['username']}:{db_conf['password']}@{db_conf['host']}:{db_conf['port']}/?service_name={db_conf['service_name']}"
         while attempt < self.retry_count:
             try:
                 self.logger.info(f"Attempting Oracle DB connection to {self.label} (try {attempt+1}/{self.retry_count})...")
-                engine = create_engine(connect_str)
-                # Test connection
-                with engine.connect() as conn:
-                    pass
-                self.logger.info(f"Oracle DB connection established via SQLAlchemy for {self.label}.")
-                return engine
+                connection = oracledb.connect(
+                    user=self.db_conf['user'],
+                    password=self.db_conf['password'],
+                    host=self.db_conf['host'],
+                    port=self.db_conf['port'],
+                    service_name=self.db_conf['service_name']
+                )
+                self.logger.info(f"Oracle DB connection established for {self.label}.")
+                return connection
             except Exception as e:
                 self.logger.error(f"Oracle DB connection failed for {self.label}: {e}")
                 attempt += 1
@@ -39,7 +56,13 @@ class OracleDB:
                     raise
 
     def get_columns(self) -> 'pd.DataFrame':
-        sql = """
+        """Retrieves the column metadata from the database.
+
+        Returns:
+            pd.DataFrame: A pandas DataFrame containing the column metadata.
+        """
+        owner_list = ', '.join(f"'{s}'" for s in self.schemas)
+        sql = f"""
         SELECT owner, table_name, column_name, data_type, data_length, data_precision, data_scale, nullable
         FROM all_tab_columns
         WHERE owner NOT IN (
@@ -50,14 +73,13 @@ class OracleDB:
             'DBSFWUSER', 'SYSDG', 'SYSKM', 'SYSRAC', 'SYSBACKUP', 'MGMT_VIEW', 'SQLTXPLAIN', 'DVSYS', 'DVF', 'GSMCATUSER',
             'GSMUSER', 'GSMROOTUSER', 'GSMREGUSER', 'GSMADMIN_INTERNAL', 'CDB$ROOT', 'PDB$SEED', 'ORACLE_OCM', 'XS$NULL'
         )
-        and owner IN upper('TEST_SCHMEA')  -- Replace with your schema(s)
+        AND owner IN ({owner_list})
         """
         try:
-            self.logger.info(f"Fetching column metadata from {self.label}...")
-            result = pd.read_sql(sql, self.engine)
+            self.logger.info(f"Fetching column metadata from {self.label} for schemas: {self.schemas}...")
+            result = pd.read_sql(sql, self.connection)
             self.logger.info(f"Fetched {len(result)} rows of column metadata from {self.label}.")
             self.logger.debug(f"Columns returned from {self.label}: {result.columns.tolist()}")
-            # Avoid printing huge samples at info level; keep debug for head
             self.logger.debug(f"Sample data from {self.label}: {result.head(5).to_dict()}")
             return result
         except Exception as e:

@@ -1,5 +1,4 @@
-cx_Oracle
 pandas
 openpyxl
 pyyaml
-sqlalchemy
+oracledb
