@@ -2,17 +2,52 @@
 
 This project compares table/view columns between two Oracle databases and generates an Excel report with:
 - **DiffColumns**: Columns with same name but different precision, scale, nullability, etc.
-- **OnlyInDB1**: Columns only in first database.
-- **OnlyInDB2**: Columns only in second database.
+- **OnlyInDB1**: Columns only in primary (reference) database.
+- **OnlyInDB2**: Columns only in secondary (target) database.
 
 ## Usage
 1. Update `src/config.yaml` with your Oracle DB connection details.
+   - Set `primary_db` to `oracle_db1` or `oracle_db2` to specify which database is the primary source of comparison (defaults to `oracle_db1`).
    - You can set `retry_count` and `retry_delay` in each DB config for connection retries.
 2. Run the pipeline:
    ```bash
    python src/db_compare.py
    ```
 3. Output Excel file `ddl_compare_result.xlsx` will be generated.
+
+## Configuration
+
+### Primary Database Selection
+You can designate one database as the primary source of comparison by setting the `primary_db` field in `config.yaml`:
+
+```yaml
+# Primary database to use as source of comparison (oracle_db1 or oracle_db2)
+primary_db: oracle_db1  # or oracle_db2
+
+oracle_db1:
+  host: localhost
+  port: 1521
+  service_name: XE
+  username: test_schema
+  password: test1234
+  retry_count: 3
+  retry_delay: 5
+
+oracle_db2:
+  host: localhost
+  port: 1522
+  service_name: XE
+  username: test_schema
+  password: test1234
+  retry_count: 3
+  retry_delay: 5
+```
+
+**Benefits:**
+- The primary database is always used as the reference (DB1 in comparison results)
+- Clear designation of "source of truth" in logs (PRIMARY DB vs SECONDARY DB)
+- Flexible comparison direction without changing database order in config
+- Defaults to `oracle_db1` if not specified or invalid
 
 ## Dev Testing
 - Use Docker to bring up two Oracle DB pods for local testing.

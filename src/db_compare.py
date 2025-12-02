@@ -1,8 +1,8 @@
 import yaml
 import pandas as pd
 import logging
-from db.oracle_db import OracleDB
-from excel.excel_writer import ExcelWriter
+from src.db.oracle_db import OracleDB
+from src.excel.excel_writer import ExcelWriter
 
 def compare_ddls(config_path):
     """Compares the DDLs of two Oracle databases.
@@ -26,10 +26,24 @@ def compare_ddls(config_path):
         if not result_path.lower().endswith('.xlsx'):
             result_path += '.xlsx'
 
-        db1 = OracleDB(config['oracle_db1'])
-        logger.info(f"Successfully connected to DB1: {config['oracle_db1'].get('username','<user>')}@{config['oracle_db1'].get('host')}:{config['oracle_db1'].get('port')}/{config['oracle_db1'].get('service_name')}")
-        db2 = OracleDB(config['oracle_db2'])
-        logger.info(f"Successfully connected to DB2: {config['oracle_db2'].get('username','<user>')}@{config['oracle_db2'].get('host')}:{config['oracle_db2'].get('port')}/{config['oracle_db2'].get('service_name')}")
+        # Determine which database is primary
+        primary_db = config.get('primary_db', 'oracle_db1')
+        if primary_db not in ['oracle_db1', 'oracle_db2']:
+            logger.warning(f"Invalid primary_db '{primary_db}' in config. Defaulting to 'oracle_db1'.")
+            primary_db = 'oracle_db1'
+        
+        # Assign databases so primary is always db1 (reference), secondary is db2 (target)
+        if primary_db == 'oracle_db1':
+            primary_config = config['oracle_db1']
+            secondary_config = config['oracle_db2']
+        else:
+            primary_config = config['oracle_db2']
+            secondary_config = config['oracle_db1']
+        
+        db1 = OracleDB(primary_config)
+        logger.info(f"Successfully connected to PRIMARY DB: {primary_config.get('username','<user>')}@{primary_config.get('host')}:{primary_config.get('port')}/{primary_config.get('service_name')}")
+        db2 = OracleDB(secondary_config)
+        logger.info(f"Successfully connected to SECONDARY DB: {secondary_config.get('username','<user>')}@{secondary_config.get('host')}:{secondary_config.get('port')}/{secondary_config.get('service_name')}")
         df1 = db1.get_columns()
         df2 = db2.get_columns()
 

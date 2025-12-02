@@ -53,5 +53,35 @@ class TestExcelWriter(unittest.TestCase):
         self.assertEqual(ws_only_db2['A2'].value, 5)
         self.assertEqual(ws_only_db2['B3'].value, 'F')
 
+    def test_write_empty_dataframes(self):
+        """Test writing empty dataframes"""
+        diff = pd.DataFrame()
+        only_db1 = pd.DataFrame()
+        only_db2 = pd.DataFrame()
+
+        # Write to excel
+        ExcelWriter.write(diff, only_db1, only_db2, self.test_file)
+
+        # Check if file exists
+        self.assertTrue(os.path.exists(self.test_file))
+
+        # Check content of the excel file
+        wb = openpyxl.load_workbook(self.test_file)
+
+        # Check sheet names
+        self.assertEqual(wb.sheetnames, ['DiffColumns', 'OnlyInDB1', 'OnlyInDB2'])
+
+    def test_write_exception_handling(self):
+        """Test exception handling during write"""
+        diff = pd.DataFrame({'col1': [1, 2], 'col2': ['A', 'B']})
+        only_db1 = pd.DataFrame({'col3': [3, 4], 'col4': ['C', 'D']})
+        only_db2 = pd.DataFrame({'col5': [5, 6], 'col6': ['E', 'F']})
+
+        # Use an invalid path to trigger exception
+        invalid_path = '/invalid/path/file.xlsx'
+        
+        with self.assertRaises(Exception):
+            ExcelWriter.write(diff, only_db1, only_db2, invalid_path)
+
 if __name__ == '__main__':
     unittest.main()

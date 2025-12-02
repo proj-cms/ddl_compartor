@@ -1,3 +1,6 @@
+# Primary database to use as source of comparison (oracle_db1 or oracle_db2)
+primary_db: oracle_db1
+
 oracle_db1:
   host: localhost
   port: 1521
