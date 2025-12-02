@@ -1,20 +1,58 @@
+"""Excel Report Writer Module
+
+This module provides functionality to export database comparison results to Excel format
+with automatic formatting and visual highlighting of differences.
+
+The ExcelWriter class creates multi-sheet Excel workbooks with:
+- DiffColumns: Columns with differences, with changed values highlighted in yellow
+- OnlyInDB1: Columns unique to the primary database
+- OnlyInDB2: Columns unique to the secondary database
+
+Typical usage example:
+    from src.excel.excel_writer import ExcelWriter
+    import pandas as pd
+    
+    diff_df = pd.DataFrame({'col1': [1, 2]})
+    only_db1_df = pd.DataFrame({'col2': [3, 4]})
+    only_db2_df = pd.DataFrame({'col3': [5, 6]})
+    
+    ExcelWriter.write(diff_df, only_db1_df, only_db2_df, 'output.xlsx')
+"""
+
 import pandas as pd
 import logging
-
-import pandas as pd
 from typing import Any
 
+
 class ExcelWriter:
-    """A class to write the comparison results to an Excel file."""
+    """A class to write database comparison results to an Excel file with formatting.
+    
+    This static class provides methods to export comparison results to Excel format
+    with automatic highlighting of differences for easy visual inspection.
+    """
+    
     @staticmethod
     def write(diff: pd.DataFrame, only_db1: pd.DataFrame, only_db2: pd.DataFrame, out_path: str) -> None:
-        """Writes the comparison results to an Excel file.
+        """Writes the comparison results to an Excel file with formatting.
+        
+        Creates a multi-sheet Excel workbook with automatic highlighting of differing columns.
+        Columns ending with '_db1' or '_db2' in the DiffColumns sheet are highlighted in yellow.
 
         Args:
             diff (pd.DataFrame): A DataFrame containing the differences between the two databases.
-            only_db1 (pd.DataFrame): A DataFrame containing the tables only in the first database.
-            only_db2 (pd.DataFrame): A DataFrame containing the tables only in the second database.
-            out_path (str): The path to the output Excel file.
+                Expected to have columns with '_db1' and '_db2' suffixes for comparison.
+            only_db1 (pd.DataFrame): A DataFrame containing columns only in the primary database.
+            only_db2 (pd.DataFrame): A DataFrame containing columns only in the secondary database.
+            out_path (str): The path to the output Excel file. Will be created or overwritten.
+            
+        Raises:
+            PermissionError: If the output file is open or write-protected
+            OSError: If the output path is invalid or disk is full
+            Exception: If Excel writing or formatting fails
+            
+        Example:
+            >>> ExcelWriter.write(diff_df, only_db1_df, only_db2_df, 'results.xlsx')
+            >>> print("Results written successfully")
         """
         import openpyxl
         from openpyxl.styles import PatternFill

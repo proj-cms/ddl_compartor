@@ -1,3 +1,32 @@
+"""Oracle DDL Comparator - Database Comparison Module
+
+This module provides functionality to compare Data Definition Language (DDL) metadata
+between two Oracle databases and generate a detailed comparison report.
+
+The module compares table column definitions including data types, lengths, precision,
+scale, and nullability constraints. Results are exported to an Excel file with three sheets:
+- DiffColumns: Columns that exist in both databases but have different attributes
+- OnlyInDB1: Columns that exist only in the primary (reference) database
+- OnlyInDB2: Columns that exist only in the secondary (target) database
+
+Typical usage example:
+    from src.db_compare import compare_ddls
+    
+    # Run comparison with config file
+    diff, only_db1, only_db2, result_path = compare_ddls('config.yaml')
+    
+    # Write results to Excel
+    from src.excel.excel_writer import ExcelWriter
+    ExcelWriter.write(diff, only_db1, only_db2, result_path)
+
+Configuration:
+    The config.yaml file should include:
+    - primary_db: Which database to use as reference (oracle_db1 or oracle_db2)
+    - oracle_db1: Connection details for first database
+    - oracle_db2: Connection details for second database
+    - result_excel_path: Output file path (use 'DEFAULT' for auto-generated name)
+"""
+
 import yaml
 import pandas as pd
 import logging
@@ -6,12 +35,32 @@ from src.excel.excel_writer import ExcelWriter
 
 def compare_ddls(config_path):
     """Compares the DDLs of two Oracle databases.
+    
+    Reads database connection configurations from a YAML file, connects to both databases,
+    retrieves column metadata, and identifies differences. The comparison includes data types,
+    lengths, precision, scale, and nullability constraints.
 
     Args:
-        config_path (str): The path to the configuration file.
+        config_path (str): The path to the YAML configuration file containing database
+            connection details and comparison settings.
 
     Returns:
-        tuple: A tuple containing the differences, tables only in db1, tables only in db2, and the result path.
+        tuple: A 4-element tuple containing:
+            - diff (pd.DataFrame): Columns with differing attributes in both databases
+            - only_db1 (pd.DataFrame): Columns only present in the primary database
+            - only_db2 (pd.DataFrame): Columns only present in the secondary database
+            - result_path (str): The resolved path where Excel results will be written
+            
+    Raises:
+        FileNotFoundError: If the configuration file doesn't exist
+        yaml.YAMLError: If the configuration file is malformed
+        KeyError: If required configuration keys are missing
+        Exception: If database connection or query execution fails
+        
+    Example:
+        >>> diff, only_db1, only_db2, path = compare_ddls('config.yaml')
+        >>> print(f"Found {len(diff)} differing columns")
+        >>> print(f"Results will be written to: {path}")
     """
     import os
     logger = logging.getLogger(__name__)

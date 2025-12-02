@@ -1,3 +1,27 @@
+"""Oracle Database Connection and Metadata Retrieval Module
+
+This module provides the OracleDB class for connecting to Oracle databases with retry logic
+and retrieving table column metadata. It handles connection failures gracefully with
+configurable retry mechanisms and filters out Oracle system schemas automatically.
+
+Typical usage example:
+    from src.db.oracle_db import OracleDB
+    
+    db_config = {
+        'user': 'my_user',
+        'password': 'my_password',
+        'host': 'localhost',
+        'port': 1521,
+        'service_name': 'XE',
+        'retry_count': 3,
+        'retry_delay': 5
+    }
+    
+    db = OracleDB(db_config)
+    columns_df = db.get_columns()
+    print(f"Retrieved {len(columns_df)} columns")
+"""
+
 import oracledb
 import pandas as pd
 import logging
@@ -6,12 +30,40 @@ import time
 from typing import Dict, Any
 
 class OracleDB:
-    """A class to connect to an Oracle database and retrieve column metadata."""
+    """A class to connect to an Oracle database and retrieve column metadata.
+    
+    This class manages Oracle database connections with automatic retry logic and provides
+    methods to query table column metadata while automatically filtering out system schemas.
+    
+    Attributes:
+        logger (logging.Logger): Logger instance for this class
+        db_conf (Dict[str, Any]): Database configuration dictionary
+        label (str): Human-readable label for this database connection
+        schemas (List[str]): List of schemas to include in queries (uppercase)
+        retry_count (int): Maximum number of connection retry attempts
+        retry_delay (int): Seconds to wait between retry attempts
+        connection: Oracle database connection object
+    """
+    
     def __init__(self, db_conf: Dict[str, Any]) -> None:
-        """Initializes the OracleDB object.
+        """Initializes the OracleDB object and establishes database connection.
+        
+        Processes the configuration, sets up retry parameters, normalizes schema names,
+        and attempts to connect to the database with retry logic.
 
         Args:
             db_conf (Dict[str, Any]): A dictionary containing the database connection configuration.
+                Required keys: user, password, host, port, service_name
+                Optional keys: label, schema/schemas, retry_count (default: 3), retry_delay (default: 5)
+                
+        Raises:
+            KeyError: If required configuration keys are missing
+            Exception: If connection fails after all retry attempts
+            
+        Example:
+            >>> config = {'user': 'test', 'password': 'pass', 'host': 'localhost', 
+            ...           'port': 1521, 'service_name': 'XE'}
+            >>> db = OracleDB(config)
         """
         self.logger = logging.getLogger(__name__)
         self.db_conf = db_conf
@@ -28,9 +80,15 @@ class OracleDB:
 
     def _connect_with_retry(self) -> Any:
         """Connects to the Oracle database with a retry mechanism.
+        
+        Attempts to establish a database connection with exponential backoff between retries.
+        Logs all connection attempts and failures.
 
         Returns:
-            Any: The connection object.
+            Any: The Oracle database connection object.
+            
+        Raises:
+            Exception: If max retries are exceeded without successful connection
         """
         attempt = 0
         while attempt < self.retry_count:
@@ -57,9 +115,28 @@ class OracleDB:
 
     def get_columns(self) -> 'pd.DataFrame':
         """Retrieves the column metadata from the database.
+        
+        Queries the all_tab_columns system view to get column definitions for all tables
+        in the configured schemas. Automatically filters out Oracle system schemas.
 
         Returns:
-            pd.DataFrame: A pandas DataFrame containing the column metadata.
+            pd.DataFrame: A pandas DataFrame containing the column metadata with columns:
+                - owner: Schema name
+                - table_name: Table name
+                - column_name: Column name
+                - data_type: Oracle data type (VARCHAR2, NUMBER, etc.)
+                - data_length: Maximum length for character types
+                - data_precision: Numeric precision
+                - data_scale: Numeric scale
+                - nullable: 'Y' if nullable, 'N' if NOT NULL
+                
+        Raises:
+            Exception: If the SQL query execution fails
+            
+        Example:
+            >>> db = OracleDB(config)
+            >>> df = db.get_columns()
+            >>> print(df[['table_name', 'column_name', 'data_type']].head())
         """
         owner_list = ', '.join(f"'{s}'" for s in self.schemas)
         sql = f"""

@@ -36,3 +36,6 @@ Thumbs.db
 
 # Ignore local docker helper scripts/folders
 docker_commands/
+
+# Generated API documentation
+docs/

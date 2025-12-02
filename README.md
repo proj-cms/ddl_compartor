@@ -49,6 +49,42 @@ oracle_db2:
 - Flexible comparison direction without changing database order in config
 - Defaults to `oracle_db1` if not specified or invalid
 
+
+## API Documentation
+
+This project includes comprehensive API documentation generated from Python docstrings.
+
+### Generating Documentation
+
+To generate HTML API documentation:
+
+**Using Python script:**
+```bash
+python generate_docs.py
+```
+
+**Using batch file (Windows):**
+```bash
+generate_docs.bat
+```
+
+**Manual generation:**
+```bash
+pip install pdoc3
+pdoc --html --output-dir docs --force src
+```
+
+### Viewing Documentation
+
+After generation, open `docs/src/index.html` in your web browser to view the full API reference with:
+- Module-level documentation
+- Class and method documentation
+- Usage examples
+- Parameter and return type information
+- Exception documentation
+
+The documentation is automatically generated from docstrings in the source code, similar to Javadoc for Java.
+
 ## Dev Testing
 - Use Docker to bring up two Oracle DB pods for local testing.
 - Example docker-compose is provided in `docker-compose.yml`.
