@@ -63,22 +63,22 @@ class ExcelWriter:
                 diff.to_excel(writer, sheet_name='DiffColumns', index=False)
                 only_db1.to_excel(writer, sheet_name='OnlyInDB1', index=False)
                 only_db2.to_excel(writer, sheet_name='OnlyInDB2', index=False)
-            # Highlight differences in DiffColumns sheet
-            wb = openpyxl.load_workbook(out_path)
-            ws = wb['DiffColumns']
-            # Find columns that differ and highlight them
-            header = [cell.value for cell in ws[1]]
-            # Only process if header exists and has values
-            if header and any(header):
-                diff_cols = [i for i, col in enumerate(header) if col and (col.endswith('_db1') or col.endswith('_db2'))]
-                fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')
-                # Only iterate if there are data rows
-                if ws.max_row and ws.max_row > 1:
-                    for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
-                        for i in diff_cols:
-                            if i < len(row) and row[i].value is not None:
-                                row[i].fill = fill
-            wb.save(out_path)
+
+                # Highlight differences in DiffColumns sheet
+                wb = writer.book
+                ws = writer.sheets['DiffColumns']
+                # Find columns that differ and highlight them
+                header = [cell.value for cell in ws[1]]
+                # Only process if header exists and has values
+                if header and any(header):
+                    diff_cols = [i for i, col in enumerate(header) if col and (col.endswith('_db1') or col.endswith('_db2'))]
+                    fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')
+                    # Only iterate if there are data rows
+                    if ws.max_row and ws.max_row > 1:
+                        for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+                            for i in diff_cols:
+                                if i < len(row) and row[i].value is not None:
+                                    row[i].fill = fill
             logger.info("Excel file written and differences highlighted successfully.")
         except Exception as e:
             logger.error(f"Error writing Excel file: {e}")
