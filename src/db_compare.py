@@ -111,8 +111,8 @@ def compare_ddls(config_path):
         merged = pd.merge(df1, df2, on=['table_name', 'column_name'], suffixes=('_db1', '_db2'))
         diff = merged[(merged['data_type_db1'] != merged['data_type_db2']) |
                       (merged['data_length_db1'] != merged['data_length_db2']) |
-                      (merged['data_precision_db1'] != merged['data_precision_db2']) |
-                      (merged['data_scale_db1'] != merged['data_scale_db2']) |
+                      (merged['data_precision_db1'].fillna(-1) != merged['data_precision_db2'].fillna(-1)) |
+                      (merged['data_scale_db1'].fillna(-1) != merged['data_scale_db2'].fillna(-1)) |
                       (merged['nullable_db1'] != merged['nullable_db2'])]
         only_db1 = df1[~df1.set_index(['table_name', 'column_name']).index.isin(df2.set_index(['table_name', 'column_name']).index)]
         only_db2 = df2[~df2.set_index(['table_name', 'column_name']).index.isin(df1.set_index(['table_name', 'column_name']).index)]
