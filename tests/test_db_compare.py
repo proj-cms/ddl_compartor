@@ -4,6 +4,7 @@ import pandas as pd
 import yaml
 import os
 import sys
+import io
 
 # Mock oracledb module before importing from src
 sys.modules['oracledb'] = Mock()
@@ -21,7 +22,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b'},
             'result_excel_path': 'test_result.xlsx'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         # Mock database data
         db_data = {
@@ -57,7 +58,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b'},
             'result_excel_path': 'test_result.xlsx'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         # Mock database data
         db1_data = {
@@ -112,7 +113,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b'},
             'result_excel_path': 'test_result.xlsx'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         # Mock database data
         db1_data = {
@@ -167,7 +168,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b', 'username': 'user2', 'host': 'host2', 'port': 1522, 'service_name': 'XE'},
             'result_excel_path': 'test_result.xlsx'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         db_data = pd.DataFrame({
             'table_name': ['TABLE1'], 'column_name': ['COL1'], 'data_type': ['VARCHAR2'],
@@ -199,7 +200,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b', 'username': 'user2', 'host': 'host2', 'port': 1522, 'service_name': 'XE'},
             'result_excel_path': 'test_result.xlsx'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         db_data = pd.DataFrame({
             'table_name': ['TABLE1'], 'column_name': ['COL1'], 'data_type': ['VARCHAR2'],
@@ -232,7 +233,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b', 'username': 'user2', 'host': 'host2', 'port': 1522, 'service_name': 'XE'},
             'result_excel_path': 'test_result.xlsx'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         db_data = pd.DataFrame({
             'table_name': ['TABLE1'], 'column_name': ['COL1'], 'data_type': ['VARCHAR2'],
@@ -258,7 +259,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b', 'username': 'user2', 'host': 'host2', 'port': 1522, 'service_name': 'XE'},
             'result_excel_path': 'test_result.xlsx'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         db_data = pd.DataFrame({
             'table_name': ['TABLE1'], 'column_name': ['COL1'], 'data_type': ['VARCHAR2'],
@@ -283,7 +284,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b', 'username': 'user2', 'host': 'host2', 'port': 1522, 'service_name': 'XE'},
             'result_excel_path': 'test_result.xlsx'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         empty_df = pd.DataFrame()
         normal_df = pd.DataFrame({
@@ -314,7 +315,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b', 'username': 'user2', 'host': 'host2', 'port': 1522, 'service_name': 'XE'},
             'result_excel_path': 'test_result.xlsx'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         normal_df = pd.DataFrame({
             'table_name': ['TABLE1'], 'column_name': ['COL1'], 'data_type': ['VARCHAR2'],
@@ -347,7 +348,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b', 'username': 'user2', 'host': 'host2', 'port': 1522, 'service_name': 'XE'},
             'result_excel_path': 'DEFAULT'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         db_data = pd.DataFrame({
             'table_name': ['TABLE1'], 'column_name': ['COL1'], 'data_type': ['VARCHAR2'],
@@ -372,7 +373,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b', 'username': 'user2', 'host': 'host2', 'port': 1522, 'service_name': 'XE'},
             'result_excel_path': 'my_result'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         db_data = pd.DataFrame({
             'table_name': ['TABLE1'], 'column_name': ['COL1'], 'data_type': ['VARCHAR2'],
@@ -397,7 +398,7 @@ class TestDBCompare(unittest.TestCase):
             'oracle_db2': {'user': 'b', 'username': 'user2', 'host': 'host2', 'port': 1522, 'service_name': 'XE'},
             'result_excel_path': 'test_result.xlsx'
         }
-        mock_open.return_value.__enter__.return_value.read.return_value = yaml.dump(mock_yaml)
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
 
         # Make OracleDB raise an exception
         mock_oracle_db.side_effect = Exception("Database connection failed")
@@ -406,6 +407,92 @@ class TestDBCompare(unittest.TestCase):
             compare_ddls('dummy_config.yaml')
         
         self.assertIn("Database connection failed", str(context.exception))
+
+    @patch('src.db_compare.OracleDB')
+    @patch('builtins.open')
+    def test_compare_ddls_nan_precision(self, mock_open, mock_oracle_db):
+        """Test that NaN precision and scale do not cause false differences"""
+        mock_yaml = {
+            'oracle_db1': {'user': 'a'},
+            'oracle_db2': {'user': 'b'},
+            'result_excel_path': 'test_result.xlsx'
+        }
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
+
+        # Mock database data where precision and scale are None (NaN in pandas)
+        db_data = {
+            'table_name': ['TABLE1'],
+            'column_name': ['COL1'],
+            'data_type': ['VARCHAR2'],
+            'data_length': [20],
+            'data_precision': [None],
+            'data_scale': [None],
+            'nullable': ['N']
+        }
+        mock_df = pd.DataFrame(db_data)
+
+        mock_db_instance = MagicMock()
+        mock_db_instance.get_columns.return_value = mock_df
+        mock_oracle_db.return_value = mock_db_instance
+
+        # Run the comparison
+        diff, only_db1, only_db2, result_path = compare_ddls('dummy_config.yaml')
+
+        # Assertions - diff should be empty, no false positives
+        self.assertTrue(diff.empty)
+
+    @patch('src.db_compare.OracleDB')
+    @patch('builtins.open')
+    def test_compare_ddls_nan_precision_diff(self, mock_open, mock_oracle_db):
+        """Test that NaN precision vs actual precision correctly shows a difference"""
+        mock_yaml = {
+            'oracle_db1': {'user': 'a'},
+            'oracle_db2': {'user': 'b'},
+            'result_excel_path': 'test_result.xlsx'
+        }
+        mock_open.return_value.__enter__.return_value = io.StringIO(yaml.dump(mock_yaml))
+
+        # DB1 has None precision
+        db1_data = {
+            'table_name': ['TABLE1'],
+            'column_name': ['COL1'],
+            'data_type': ['NUMBER'],
+            'data_length': [22],
+            'data_precision': [None],
+            'data_scale': [None],
+            'nullable': ['N']
+        }
+        df1 = pd.DataFrame(db1_data)
+
+        # DB2 has 10 precision
+        db2_data = {
+            'table_name': ['TABLE1'],
+            'column_name': ['COL1'],
+            'data_type': ['NUMBER'],
+            'data_length': [22],
+            'data_precision': [10],
+            'data_scale': [2],
+            'nullable': ['N']
+        }
+        df2 = pd.DataFrame(db2_data)
+
+        # Mock OracleDB
+        mock_db1_instance = MagicMock()
+        mock_db1_instance.get_columns.return_value = df1
+        mock_db2_instance = MagicMock()
+        mock_db2_instance.get_columns.return_value = df2
+        def side_effect(config):
+            if config['user'] == 'a':
+                return mock_db1_instance
+            return mock_db2_instance
+        mock_oracle_db.side_effect = side_effect
+
+        # Run the comparison
+        diff, only_db1, only_db2, result_path = compare_ddls('dummy_config.yaml')
+
+        # Assertions - diff should have 1 row
+        self.assertEqual(len(diff), 1)
+
 
 if __name__ == '__main__':
     unittest.main()
